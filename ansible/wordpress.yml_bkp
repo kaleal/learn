@@ -1,0 +1,72 @@
+---
+ - hosts: dbservers
+   tasks:
+   - name: Install MySQL Server and dependencies
+     apt: name={{item}} state=latest
+     with_items:
+       - mysql-server
+       - python-mysqldb
+   - name: Ensure Apache and tools are not installed
+     apt: name={{item}} state=absent purge=yes
+     with_items:
+       - php
+       - php-mysql
+       - apache2
+       - libapache2-mod-php
+       - libapache2-mod-jk
+   - name: Configure MySQL Server
+     template: src=mysqld.conf.j2 dest=/etc/mysql/mysql.conf.d/mysqld.cnf
+     register: db_config
+   - name: Restart MySQL Server
+     when: db_config.changed
+     service: name=mysql state=restarted
+     run_once: true
+   - name: Create wordpress database
+     mysql_db:
+       name: wordpress
+       state: present
+   - name: Create wordpress user
+     mysql_user:
+       name: wordpressuser
+       host: '%'
+       password: wordpresspw
+       priv: 'wordpress.*:ALL'
+       state: present
+   - name: Extract wordpress database
+     unarchive:
+       src: files/wordpress.sql.tgz
+       dest: /tmp
+     register: aaa
+   - name: Import WordPress dump
+     when: aaa.changed
+     mysql_db:
+       name: wordpress
+       state: import
+       target: /tmp/wordpress.sql
+    
+ - hosts: webservers
+   tasks:
+   - name: update
+     apt: update_cache=yes
+   - name: Installing Apache HTTP Server and dependencies
+     apt: name={{item}} state=latest
+     with_items:
+       - php
+       - php-mysql
+       - apache2
+       - libapache2-mod-php
+     register: apache_config
+   - name: Restart Apache HTTP Server
+     when: apache_config.changed
+     service: name=apache2 state=restarted
+   - name: Extract wordpress files
+     unarchive:
+       src: files/latest.tar.gz
+       dest: /var/www/html
+   - name: Configure database connection
+     template:
+       src: templates/wp-config.php.j2
+       dest: /var/www/html/wordpress/wp-config.php
+       owner: www-data
+       group: www-data
+       mode: 0640

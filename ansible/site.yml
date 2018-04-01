@@ -1,0 +1,12 @@
+---
+ - hosts: webservers
+   tasks:
+   - name: update
+     apt: update_cache=yes
+   - name: Installing Apache HTTP Server
+     apt: name=apache2 state=latest
+
+ - hosts: dbservers
+   tasks:
+   - name: Installing MySql Server
+     apt: name=mysql-server state=latest

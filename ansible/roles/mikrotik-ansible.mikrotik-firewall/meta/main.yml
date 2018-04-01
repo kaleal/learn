@@ -1,0 +1,26 @@
+galaxy_info:
+  author: Martin Dulin
+  description: Mikrotik firewall automation
+  company: Dulin
+  license: MIT
+
+  min_ansible_version: 1.9
+
+  platforms:
+    - name: RouterOS
+      versions:
+        - all
+
+  categories:
+    - networking
+
+  galaxy_tags:
+    - networking
+    - mikrotik
+    - routeros
+    - firewall
+
+
+dependencies: []
+  # List your role dependencies here, one per line. Be sure to remove the '[]' above,
+  # if you add dependencies to this list.

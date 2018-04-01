@@ -1,0 +1,5 @@
+   - name: Copy WordPress
+     copy:
+       src: files/latest.tar.gz
+       dest: /tmp
+

@@ -1,0 +1,7 @@
+[webservers]
+ans2.example.com
+ans4.example.com
+ans5.example.com
+
+[dbservers]
+ans3.example.com

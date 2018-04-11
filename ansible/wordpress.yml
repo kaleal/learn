@@ -71,3 +71,26 @@
        owner: www-data
        group: www-data
        mode: 0640
+
+ - hosts: lbalancers
+   tasks:
+   - name: update
+     apt: update_cache=yes
+   - name: install nginx
+     apt: name={{item}} state=latest
+     with_items:
+       - nginx
+   - name: configure nginx load balancer
+     template:
+       src: templates/wordpress.j2
+       dest: /etc/nginx/sites-available/wordpress
+     register: nginx_config
+   - name: linking wordpress in nginx
+     file:
+       src: /etc/nginx/sites-available/wordpress
+       dest: /etc/nginx/sites-enabled/wordpress
+       state: link
+   - name: Restart Nginx Server
+     when: nginx_config.changed
+     service: name=nginx state=restarted
+

@@ -1,0 +1,15 @@
+upstream portal {
+   {% for host in groups['webservers'] %}
+   server {{host}};
+   {% endfor %}
+}
+
+server {
+   listen 80;
+
+   rewrite ^/$ http://{{url}}/portal permanent;
+   server_name {{url}};
+   location /portal {
+      proxy_pass http://portal/portal;
+   }
+}

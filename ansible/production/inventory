@@ -1,0 +1,10 @@
+[lbalancers]
+ans2.example.com
+
+[webservers]
+ans3.example.com
+ans6.example.com
+ans8.example.com
+
+[dbserver]
+ans7.example.com

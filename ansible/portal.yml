@@ -1,21 +1,11 @@
 ---
- - hosts: dbservers
-   vars:
-     url: 192.168.133.102
+ - hosts: dbserver
    tasks:
    - name: Install MySQL Server and dependencies
      apt: name={{item}} state=latest
      with_items:
        - mysql-server
        - python-mysqldb
-   - name: Ensure Apache and tools are not installed
-     apt: name={{item}} state=absent purge=yes
-     with_items:
-       - php
-       - php-mysql
-       - apache2
-       - libapache2-mod-php
-       - libapache2-mod-jk
    - name: Configure MySQL Server
      template: src=mysqld.conf.j2 dest=/etc/mysql/mysql.conf.d/mysqld.cnf
      register: db_config
@@ -56,18 +46,29 @@
        - php-mysql
        - apache2
        - libapache2-mod-php
-     register: apache_config
+     register: apache
+   - name: disable module mpm_event
+     command: a2dismod mpm_event
+     when: apache.changed
+   - name: enable modules
+     command: a2enmod {{item}}
+     with_items:
+       - mpm_prefork
+       - php7.0
+     when: apache.changed
    - name: Restart Apache HTTP Server
-     when: apache_config.changed
+     when: apache.changed
      service: name=apache2 state=restarted
-   - name: Extract wordpress files
-     unarchive:
-       src: files/latest.tar.gz
-       dest: /var/www/html
+   - name: Install wordpress files
+     git:
+       repo: ssh://git@ans1.example.com:/git/portal
+       dest: /var/www/html/portal
+       version: "{{ app_version }}"
+       accept_hostkey: yes
    - name: Configure database connection
      template:
        src: templates/wp-config.php.j2
-       dest: /var/www/html/wordpress/wp-config.php
+       dest: /var/www/html/portal/wp-config.php
        owner: www-data
        group: www-data
        mode: 0640
@@ -82,13 +83,13 @@
        - nginx
    - name: configure nginx load balancer
      template:
-       src: templates/wordpress.j2
-       dest: /etc/nginx/sites-available/wordpress
+       src: templates/portal.j2
+       dest: /etc/nginx/sites-available/portal
      register: nginx_config
    - name: linking wordpress in nginx
      file:
-       src: /etc/nginx/sites-available/wordpress
-       dest: /etc/nginx/sites-enabled/wordpress
+       src: /etc/nginx/sites-available/portal
+       dest: /etc/nginx/sites-enabled/portal
        state: link
    - name: Restart Nginx Server
      when: nginx_config.changed

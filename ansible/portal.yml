@@ -95,3 +95,4 @@
      when: nginx_config.changed
      service: name=nginx state=restarted
 
+

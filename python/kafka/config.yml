@@ -1,0 +1,8 @@
+kafka:
+  topics:
+    - kleber-test
+  brokers:
+    - FILL
+  credentials:
+    username: token
+    password: some_password_if_authentication_is_enalbed

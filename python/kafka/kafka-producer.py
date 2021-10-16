@@ -1,4 +1,5 @@
 import json
+import time
 import yaml
 
 from confluent_kafka import Producer
@@ -7,10 +8,9 @@ with open('config.yml', 'r') as file:
   config = yaml.safe_load(file.read())
 
 conf = {'client.id': 'kafka-python-console-sample-consumer',
-        'group.id': 'kafka-python-console-sample-group',
         'bootstrap.servers': ','.join(config['kafka']['brokers']),
         'security.protocol': 'SASL_SSL',
-        'ssl.ca.location': '/etc/pki/tls/certs/ca-bundle.crt',
+        'ssl.ca.location': '/usr/share/ca-certificates/mozilla/ISRG_Root_X1.crt',
         'sasl.mechanisms': 'PLAIN',
         'sasl.username': config['kafka']['credentials']['username'],
         'sasl.password': config['kafka']['credentials']['password'],
@@ -22,6 +22,12 @@ print(conf)
 data = {"nome": "Kleber", "beauty_index": 100}
 
 producer = Producer(conf)
-producer.produce(config['kafka']['topics'][0], json.dumps(data))
-producer.flush(30)
+counter = 1
+while True:
+    #producer.produce(config['kafka']['topics'][0], json.dumps(data))
+    producer.produce(config['kafka']['topics'][0], str(counter))
+    if counter % 100 == 0:
+        producer.flush(30)
+        time.sleep(5)
+    counter += 1
 

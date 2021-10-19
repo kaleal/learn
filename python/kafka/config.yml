@@ -1,8 +1,9 @@
 kafka:
   topics:
-    - kleber-test
+    - your_topics_here
   brokers:
-    - FILL
+    - broker-1
+    - broker2
   credentials:
     username: token
-    password: some_password_if_authentication_is_enalbed
+    password: your_password

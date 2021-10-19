@@ -6,9 +6,9 @@ RUN apt-get update && apt-get -y install \
         librdkafka-dev \
         librdkafka1 \
         python3 \
-        python3-pip
+        python3-pip \
+        && apt-get clean all
 
 COPY kafka/requirements.txt .
 
 RUN pip3 install -r requirements.txt
-

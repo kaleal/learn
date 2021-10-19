@@ -4,7 +4,7 @@ import yaml
 
 from confluent_kafka import Producer
 
-with open('config.yml', 'r') as file:
+with open('/kafka/config.yml', 'r') as file:
   config = yaml.safe_load(file.read())
 
 conf = {'client.id': 'kafka-python-console-sample-consumer',

@@ -4,7 +4,7 @@ import yaml
 
 from confluent_kafka import Consumer, KafkaError
 
-with open('config.yml', 'r') as file:
+with open('/kafka/config.yml', 'r') as file:
   config = yaml.safe_load(file.read())
 
 settings = {'client.id': 'kafka-python-console-sample-consumer',
@@ -32,5 +32,5 @@ while True:
     time.sleep(0.1)
   else:
     print(msg.value())
-consumer.unsubscribe()
 
+consumer.unsubscribe()
